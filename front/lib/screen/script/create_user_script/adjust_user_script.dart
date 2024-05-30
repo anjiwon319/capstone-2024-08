@@ -40,7 +40,9 @@ class _AdjustUserScriptState extends State<AdjustUserScript> {
       semanticsLabel: category,
       textAlign: TextAlign.start,
       style: TextStyle(
-          fontSize: fonts.category(context), fontWeight: FontWeight.w500, color: colors.textColor),
+          fontSize: fonts.category(context),
+          fontWeight: FontWeight.w500,
+          color: colors.textColor),
     );
   }
 
@@ -50,7 +52,9 @@ class _AdjustUserScriptState extends State<AdjustUserScript> {
       semanticsLabel: title,
       textAlign: TextAlign.start,
       style: TextStyle(
-          fontSize: fonts.title(context), fontWeight: FontWeight.w700, color: colors.textColor),
+          fontSize: fonts.title(context),
+          fontWeight: FontWeight.w700,
+          color: colors.textColor),
     );
   }
 

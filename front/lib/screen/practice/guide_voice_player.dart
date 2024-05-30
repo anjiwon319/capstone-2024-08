@@ -6,41 +6,73 @@ import 'package:capstone/constants/text.dart' as texts;
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:archive/archive.dart';
 
 Future<String?> sendDataToServerAndDownLoadGuideVoice(
     String text, Map<String, File?> wavFiles) async {
   var url = Uri.parse('${texts.baseUrl}/voice_guide/');
+  // final archive = Archive();
+
+  // for (var entry in wavFiles.entries) {
+  //   final file = entry.value!;
+  //   final fileName = '${entry.key}.wav';
+  //   final fileBytes = file.readAsBytesSync();
+  //   archive.addFile(ArchiveFile(fileName, fileBytes.length, fileBytes));
+  // }
+
+  // // ZIP 파일로 압축합니다.
+  // final zipEncoder = ZipEncoder();
+  // final zipBytes = zipEncoder.encode(archive);
 
   print("함수 내에서의 사용자 음성 파일들 : $wavFiles");
+  // print("압출한 zipBytes : ${zipBytes!.isNotEmpty}");
 
   // 멀티파트 리퀘스트 생성
   var request = http.MultipartRequest('POST', url);
+  // request.files.add(http.MultipartFile.fromBytes(
+  //   'wavs',
+  //   zipBytes,
+  //   filename: 'wavs.zip',
+  // ));
 
   // 텍스트 필드 추가
   request.fields['sentence'] = text;
 
-  // WAV 파일들 추가
-  for (var entry in wavFiles.entries) {
-    var wavFile = entry.value;
-    print("Wav File Path : ${wavFile!.path}");
-    if (wavFile.existsSync()) {
-      var wavStream = http.ByteStream(wavFile.openRead());
-      var length = await wavFile.length();
-      var multipartFile = http.MultipartFile(
-        'wavs',
-        wavStream,
-        length,
-        filename: '${entry.key}.wav', // 파일 이름 지정
-      );
-      request.files.add(multipartFile);
-    }
+  var wavFile = wavFiles['middle']!;
+  if (wavFile.existsSync()) {
+    var wavStream = http.ByteStream(wavFile.openRead());
+    var length = await wavFile.length();
+    var multipartFile = http.MultipartFile(
+      'wavs',
+      wavStream,
+      length,
+      filename: 'middle.wav', // 파일 이름 지정
+    );
+    request.files.add(multipartFile);
   }
+
+  // // WAV 파일들 추가
+  // for (var entry in wavFiles.entries) {
+  //   var wavFile = entry.value;
+  //   print("Wav File Path : ${wavFile!.path}");
+  //   if (wavFile.existsSync()) {
+  //     var wavStream = http.ByteStream(wavFile.openRead());
+  //     var length = await wavFile.length();
+  //     var multipartFile = http.MultipartFile(
+  //       'wavs',
+  //       wavStream,
+  //       length,
+  //       filename: '${entry.key}.wav', // 파일 이름 지정
+  //     );
+  //     request.files.add(multipartFile);
+  //   }
+  // }
 
   print('request: ${request}');
 
   // 리퀘스트 보내기
   var response = await request.send();
-
+  print(response.statusCode);
   // 응답 확인
   if (response.statusCode == 200) {
     // 서버에서 받은 응답 파싱
